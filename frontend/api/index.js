@@ -1,8 +1,8 @@
 import axios from "axios"
 const URL= "http://localhost:3000/"
 
-const registerUser=(username, email, password)=>{
-    return (axios.post(`${URL}authenticate/register`,{username:username, email:email, password:password}))
+const registerUser=(username, email, password, walletAddress)=>{
+    return (axios.post(`${URL}authenticate/register`,{username:username, email:email, password:password, walletAddress:walletAddress}))
 }
 
 const loginUser=(identifier, password)=>{
