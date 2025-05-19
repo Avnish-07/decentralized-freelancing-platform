@@ -5,8 +5,8 @@ const registerUser=(username, email, password, walletAddress)=>{
     return (axios.post(`${URL}authenticate/register`,{username:username, email:email, password:password, walletAddress:walletAddress}))
 }
 
-const loginUser=(identifier, password)=>{
-    return axios.post(`${URL}authenticate/login`,{identifier:identifier,password:password})
+const loginUser=(identifier, password, walletAddress)=>{
+    return axios.post(`${URL}authenticate/login`,{identifier:identifier,password:password, walletAddress:walletAddress})
 }
 
 const postProject=(title, description, client, budget, deadline)=>{

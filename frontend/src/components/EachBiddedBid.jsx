@@ -14,6 +14,7 @@ const EachBiddedBid = ({ eachBid }) => {
         const isConfirmed= confirm("Are you sure to select this bid for your project")
         if(isConfirmed){
             const res= await bidSelected(eachBid._id)
+            console.log(res.data,"this select")
             navigate("/manageProjects")
         }
     }

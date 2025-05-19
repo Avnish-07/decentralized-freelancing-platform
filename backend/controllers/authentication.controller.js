@@ -47,7 +47,7 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
     try {
-        const { identifier, password } = req.body;
+        const { identifier, password, walletAddress } = req.body;
 
         if (!identifier || !password) {
             throw new Error("Identfier or Password is missing ")
@@ -56,6 +56,11 @@ const login = async (req, res) => {
         const loggedinUser = await User.findOne(
             { $or: [{ username: identifier }, { email: identifier }] }
         )
+
+        if(walletAddress !== loggedinUser.walletAddress){
+        return res.json("Wallet address is not same");
+        }
+
 
         if (!loggedinUser) {
             throw new Error("User doesn't exist, please Register");
