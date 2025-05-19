@@ -1,23 +1,64 @@
 import React from "react";
-import { Box, Typography, Paper, Avatar, Stack, Button } from "@mui/material";
+import {Typography, Paper, Avatar, Stack, Button } from "@mui/material";
 import { motion } from "framer-motion";
 import { bidSelected } from "../../api";
 import {useNavigate} from "react-router-dom";
-
+import contractData from "../../api/abi.json"
+import { ethers } from "ethers";
 
 const EachBiddedBid = ({ eachBid }) => {
 
     const navigate= useNavigate()
 
-    const bidForProjectSelected = async(eachBid) => {
-        console.log("Bid selected:", eachBid);
-        const isConfirmed= confirm("Are you sure to select this bid for your project")
-        if(isConfirmed){
-            const res= await bidSelected(eachBid._id)
-            console.log(res.data,"this select")
-            navigate("/manageProjects")
+
+const bidForProjectSelected = async (eachBid) => {
+    try {
+        const isConfirmed = confirm("Are you sure to select this bid for your project?");
+        if (!isConfirmed) return;
+
+
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
+
+        const contract = new ethers.Contract(
+            "0x4C5a2dDcc87A13dF9873939a97B9a7EDa405aD24", 
+            contractData.abi,
+            signer
+        );
+
+        if(signer.address.toLowerCase() !== eachBid.client.walletAddress){
+            console.log(signer.address, eachBid.client.walletAddress)
+            alert("Pay the amount from registered wallet address")
+            return;
         }
+
+        const projectIdBytes32 = ethers.keccak256(ethers.toUtf8Bytes(eachBid.project));// Convert projectId to bytes32
+
+        const amountInWei = ethers.parseEther(eachBid.amount.toString()); //convert in wei then in string 
+
+        const tx = await contract.lockMoney(
+            projectIdBytes32,
+            eachBid.freelancer.walletAddress,
+            eachBid.client.walletAddress,
+            amountInWei,
+            { value: amountInWei }
+        );
+
+        await tx.wait();
+        console.log("Funds locked successfully.");
+
+        const res = await bidSelected(eachBid._id);
+        console.log("Bid saved in DB:", res.data);
+
+        
+        navigate("/manageProjects");
+
+    } catch (error) {
+        console.error("Error locking funds:", error);
+        alert("Transaction failed: " + error.message);
     }
+};
+
     
     return (
         <Paper

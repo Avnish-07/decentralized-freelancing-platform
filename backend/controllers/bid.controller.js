@@ -37,7 +37,9 @@ const getAllBidsOfAProject = async (req, res) => {
             throw new Error("ProjectId is missing")
         }
 
-        const allBids = await Bid.find({ project: projectId }).populate("freelancer", "username");
+         const allBids = await Bid.find({ project: projectId })
+            .populate("freelancer", "username walletAddress")
+            .populate("client", "walletAddress");
 
         return res.json(allBids);
     } catch (err) {
@@ -60,6 +62,7 @@ const bidSelected = async (req, res) => {
                 { path: "client", select: "walletAddress" }
             ]);
 
+
         if (!chosenBid) {
             throw new Error("Chosen bid not found");
         }
@@ -75,9 +78,11 @@ const bidSelected = async (req, res) => {
 
         // console.log(chosenBid,selectedBidForProject.selectedBid);
 
-        return res.json({selectedBidForProject,
+        return res.json({
+            selectedBidForProject,
             freelancerWallet: chosenBid.freelancer.walletAddress,
-            clientWallet: chosenBid.client.walletAddress}
+            clientWallet: chosenBid.client.walletAddress
+        }
         )
     } catch (err) {
         return res.json(err.message || "error in bid selection")
