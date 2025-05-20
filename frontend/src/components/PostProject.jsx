@@ -30,6 +30,11 @@ const PostProject = () => {
             console.log("Budget must be in numeric form");
             return;
         }
+
+        if (projectDetails.budget <= 0.00001) {
+            console.log("Budget must be greater than 0.00001");
+            return;            
+        }
     
         let formattedDate = new Date(projectDetails.deadline);
         let currentDate = new Date();
