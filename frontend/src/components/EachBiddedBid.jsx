@@ -21,7 +21,7 @@ const bidForProjectSelected = async (eachBid) => {
         const signer = await provider.getSigner();
 
         const contract = new ethers.Contract(
-            "0x4C5a2dDcc87A13dF9873939a97B9a7EDa405aD24", 
+            contractData.contractAddress, 
             contractData.abi,
             signer
         );
@@ -33,7 +33,7 @@ const bidForProjectSelected = async (eachBid) => {
         }
 
         const projectIdBytes32 = ethers.keccak256(ethers.toUtf8Bytes(eachBid.project));// Convert projectId to bytes32
-
+         console.log(projectIdBytes32)
         const amountInWei = ethers.parseEther(eachBid.amount.toString()); //convert in wei then in string 
 
         const tx = await contract.lockMoney(
@@ -45,6 +45,9 @@ const bidForProjectSelected = async (eachBid) => {
         );
 
         await tx.wait();
+
+        const checker= await contract.projects(projectIdBytes32);
+        console.log("checking project is present or not", checker)
         console.log("Funds locked successfully.");
 
         const res = await bidSelected(eachBid._id);

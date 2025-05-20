@@ -2,11 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Box, Typography, Paper, Stack, Chip, Button } from "@mui/material";
 import { motion } from "framer-motion";
-import { getProjectDetails } from "../../api"; // Replace with your actual API functions
+import { getProjectDetails } from "../../api"; 
+import {ethers} from "ethers";
+import contractData from "../../api/abi.json";
 
 const FreelancerInProgressProjectDetails = () => {
     const { projectId } = useParams();
     const [projectData, setProjectData] = useState(null);
+    const [markedTrue, setMarkedTrue] = useState(false);
 
     useEffect(() => {
         const gettingProjectDetails = async () => {
@@ -17,10 +20,53 @@ const FreelancerInProgressProjectDetails = () => {
             } catch (error) {
                 console.error("Error fetching project details:", error);
             }
+
+             try{
+            const provider= new ethers.BrowserProvider(window.ethereum);
+            const signer= await provider.getSigner();
+            const contract= new ethers.Contract(
+                contractData.contractAddress,
+                contractData.abi,
+                signer
+            )
+
+                        const projectIdBytes32= ethers.keccak256(ethers.toUtf8Bytes(projectId));
+                        console.log(projectIdBytes32)
+                        const projectStruct= await contract.projects(projectIdBytes32);
+                        const val= projectStruct.freelancerCompleted
+                        setMarkedTrue(val);
+
+        }catch(err){
+            alert("Failed to fetch: " + err.message);
+        }
         };
 
         gettingProjectDetails();
     }, [projectId]);
+
+    const freelancerMarkProjectDone = async () => {
+        try{
+            const provider= new ethers.BrowserProvider(window.ethereum);
+            const signer= await provider.getSigner();
+            const contract= new ethers.Contract(
+                contractData.contractAddress,
+                contractData.abi,
+                signer
+            )
+
+            const projectIdBytes32= ethers.keccak256(ethers.toUtf8Bytes(projectId));
+            console.log(projectIdBytes32)
+            const tx= await contract.freelancerMarked(projectIdBytes32)
+            
+            await tx.wait();
+            setMarkedTrue(true);
+            alert("Project marked as done successfully.");
+        }catch(err){
+            console.log("Error marking project as done:", err);
+            alert("Transaction failed: " + err.message);
+        }
+    }
+
 
     if (!projectData) {
         return (
@@ -192,8 +238,9 @@ const FreelancerInProgressProjectDetails = () => {
                                     boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
                                 }}
                                 disabled={projectData.status === "completed"}
+                                onClick={freelancerMarkProjectDone}
                             >
-                                Mark Project Done
+                                {markedTrue?"Project Marked As Done":"Mark Project As Done"}
                             </Button>
                         </motion.div>
                     </Box>

@@ -7,6 +7,7 @@ contract freelancingLockMoney{
         bool freelancerCompleted;
         bool clientCompleted;
         uint projectTotalAmount;
+        bool isReleased;
     }
 
 
@@ -21,7 +22,7 @@ contract freelancingLockMoney{
         require(msg.value>0,"Value should be greater than 0");
         require(msg.value==_amount,"Insufficient Amount sent");
         require(_freelancer!= address(0) && _client!= address(0),"Invalid address of freelancer or client");
-        projects[_projectId]= Project(_freelancer, _client, false, false, _amount);
+        projects[_projectId]= Project(_freelancer, _client, false, false, _amount, false);
         emit ProjectCreated(_projectId, _freelancer, _client, _amount);
     }
 
@@ -29,27 +30,29 @@ contract freelancingLockMoney{
         Project storage project=projects[_projectId];
         require(project.client!= address(0) && project.freelancer!= address(0) , "Invalid Project");
         require(msg.sender== project.client,"You are not the client");
+        require(!project.clientCompleted,"Already marked true");
         project.clientCompleted=true;
         emit ClientMarked(_projectId, project.client);
+        releaseMoney(_projectId);
     }
 
         function freelancerMarked(bytes32 _projectId) external{
             Project storage project=projects[_projectId];
         require(project.client!= address(0) && project.freelancer!= address(0) , "Invalid Project");
         require(msg.sender== project.freelancer,"You are not the freelancer");
+        require(!project.freelancerCompleted,"Already marked true");
         project.freelancerCompleted=true;
         emit FreelancerMarked(_projectId, project.freelancer);
+        releaseMoney(_projectId);
     }
 
-    function releaseMoney(bytes32 _projectId) external{
+    function releaseMoney(bytes32 _projectId) internal{
         Project storage project=projects[_projectId];
-        require(project.client!= address(0) && project.freelancer!= address(0) , "Invalid Project");
-        require(msg.sender== project.client,"You are not the client");
-        require(address(this).balance>=project.projectTotalAmount, "Not sufficient amount");
-        require(project.freelancerCompleted==true,"Freelancer didn't mark completed");
-        require(project.clientCompleted==true,"Client didn't mark completed");
+        if(project.clientCompleted && project.freelancerCompleted && !project.isReleased && address(this).balance>=project.projectTotalAmount){
         (bool success,)= payable(project.freelancer).call{value:project.projectTotalAmount}("");
         require(success, "Money not released");
+        project.isReleased=true;
         emit MoneyReleased(_projectId, project.freelancer, project.projectTotalAmount);
+        }
     }
 }

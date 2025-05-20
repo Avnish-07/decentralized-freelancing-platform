@@ -2,10 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Box, Typography, Paper, Stack, Chip, Button } from "@mui/material";
 import { getProjectDetails } from "../../api"; // Replace with your actual API functions
+import contractData from "../../api/abi.json"
+import { ethers } from "ethers";
 
 const ClientInProgressProjectDetails = () => {
     const { projectId } = useParams();
     const [projectData, setProjectData] = useState(null);
+    const [markedTrue, setMarkedTrue] = useState(false);
 
     useEffect(() => {
         const gettingProjectDetails = async () => {
@@ -16,10 +19,54 @@ const ClientInProgressProjectDetails = () => {
             } catch (error) {
                 console.error("Error fetching project details:", error);
             }
+
+               try{
+                        const provider= new ethers.BrowserProvider(window.ethereum);
+                        const signer= await provider.getSigner();
+                        const contract= new ethers.Contract(
+                            contractData.contractAddress,
+                            contractData.abi,
+                            signer
+                        )
+            
+                        const projectIdBytes32= ethers.keccak256(ethers.toUtf8Bytes(projectId));
+                        console.log(projectIdBytes32)
+                        const projectStruct= await contract.projects(projectIdBytes32);
+                        const val= projectStruct.clientCompleted
+                        setMarkedTrue(val);
+            
+                    }catch(err){
+                        alert("Failed to fetch: " + err.message);
+                    }
         };
 
         gettingProjectDetails();
     }, [projectId]);
+
+     const markClientProjectDone = async () => {
+            try{
+                const provider= new ethers.BrowserProvider(window.ethereum);
+                const signer= await provider.getSigner();
+                const contract= new ethers.Contract(
+                    contractData.contractAddress,
+                    contractData.abi,
+                    signer
+                )
+    
+                const projectIdBytes32= ethers.keccak256(ethers.toUtf8Bytes(projectId));
+                const checker= await contract.projects(projectIdBytes32);
+                console.log("checking project is present or not", checker)
+                 console.log(projectIdBytes32)
+                const tx= await contract.clientMarked(projectIdBytes32)
+    
+                await tx.wait();
+                setMarkedTrue(true);
+                alert("Project marked as done successfully.");
+            }catch(err){
+                console.log("Error marking project as done:", err);
+                alert("Transaction failed: " + err.message);
+            }
+        }
 
     if (!projectData) {
         return (
@@ -179,8 +226,9 @@ const ClientInProgressProjectDetails = () => {
                             borderRadius: "8px",
                         }}
                         disabled={projectData.status === "completed"}
+                        onClick={markClientProjectDone}
                     >
-                        Mark Project Done
+                        {markedTrue ? "Project Marked as Done" : "Mark Project as Done"}
                     </Button>
                 </Box>
             </Paper>
@@ -189,3 +237,7 @@ const ClientInProgressProjectDetails = () => {
 };
 
 export default ClientInProgressProjectDetails;
+
+// 0x6552a32eecab4ae35498e43672bf254ab178bb4e173b8bb4caa51da7dfa0831b
+// 0x6552a32eecab4ae35498e43672bf254ab178bb4e173b8bb4caa51da7dfa0831b
+

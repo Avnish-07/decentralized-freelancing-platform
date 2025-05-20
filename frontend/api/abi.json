@@ -1,4 +1,4 @@
-{"abi": [
+{  "abi": [
     {
       "anonymous": false,
       "inputs": [
@@ -181,23 +181,15 @@
           "internalType": "uint256",
           "name": "projectTotalAmount",
           "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "isReleased",
+          "type": "bool"
         }
       ],
       "stateMutability": "view",
       "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "bytes32",
-          "name": "_projectId",
-          "type": "bytes32"
-        }
-      ],
-      "name": "releaseMoney",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
     }
   ],
-"contractAddress":"0x4C5a2dDcc87A13dF9873939a97B9a7EDa405aD24"}
+"contractAddress":"0xf8825d6C510c02f135AD27899d13BC21cFd5bB8D"}
