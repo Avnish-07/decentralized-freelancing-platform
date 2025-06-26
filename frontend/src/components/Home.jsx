@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { AppBar, Toolbar, Typography, Button, Container, Card, CardContent, Box, IconButton, Menu, MenuItem } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { getUserDetails } from "../../api";
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
@@ -25,10 +26,23 @@ const Home = () => {
         setAnchorEl(null);
     };
 
-    const handleMyAccount = () => {
-        handleMenuClose();
-        navigate("/myAccount");
-    };
+    const handleMyAccount = async () => {
+    handleMenuClose();
+    const userId = localStorage.getItem("userId");
+
+    const res = await getUserDetails(userId);
+    const user= res.data;
+    console.log(res.data);
+    console.log("hiii");
+
+    
+    if ( !user.bio || !user.fullName || !user.linkedin || !user.portfolio) 
+    {
+        navigate("/completeProfile");
+    } else {
+        navigate("/profile");
+    }
+};
 
     const handlePostedProjects = () => {
         handleMenuClose();

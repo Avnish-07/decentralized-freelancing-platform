@@ -12,6 +12,9 @@ import ManageProjects from "./components/ManageProjects.jsx";
 import GetFreelancerInProgressProjects from "./components/GetFreelancerInProgressProjects.jsx";
 import ClientInProgressProjectDetails from "./components/ClientInProgressProjectDetails.jsx";
 import FreelancerInProgressProjectDetails from "./components/FreelancerInProgressProjectDetails.jsx";
+import CompleteProfile from "./components/CompleteProfile.jsx";
+import ShowCompleteProfile from "./components/ShowCompleteProfile.jsx";
+import ShowFreelancerProfile from "./components/ShowFreelancerProfile.jsx";
 function App() {
   return (
     <>
@@ -29,6 +32,9 @@ function App() {
        <Route path="projectsToWork" element={<GetFreelancerInProgressProjects/>}/>
        <Route path="inProgressProjectDetails/:projectId" element={<ClientInProgressProjectDetails/>}/>
        <Route path="projectToComplete/:projectId" element={<FreelancerInProgressProjectDetails/>}/>
+       <Route path="completeProfile" element={<CompleteProfile/>}/>
+       <Route path="profile" element={<ShowCompleteProfile/>}/>
+        <Route path="userProfile/:userId" element={<ShowFreelancerProfile/>}/>
       </Routes>
      </BrowserRouter>
      

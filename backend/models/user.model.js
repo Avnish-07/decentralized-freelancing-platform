@@ -19,6 +19,22 @@ const userSchema= new mongoose.Schema({
         type:String,
         unique:true,
         required:true
+    },
+    fullName:{
+        type:String,
+        default:""
+    },
+    bio:{
+        type:String,
+        default:""
+    },
+    linkedin:{
+        type:String,
+        default:""
+    },
+    portfolio:{
+        type:String,
+        default:""
     }
 },{timestamps:true})
 

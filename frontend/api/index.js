@@ -45,4 +45,14 @@ const getFreelancerInProgressProjects=(freelancerId)=>{
     return axios.get(`${URL}projects/getFreelancerInProgressProjects/${freelancerId}`);
 }
 
-export {registerUser, loginUser, postProject, getAllProjects, getProjectDetails, bidOnProject, getClientPostedProjects, getAllBidsOfAProject, getClientInProgressProjects, bidSelected, getFreelancerInProgressProjects}
+const getUserDetails=(userId)=>{
+    return axios.get(`${URL}users/getUserDetails/${userId}`);
+}
+
+const completeUserProfile = (userId, formData) => {
+  return axios.put(`${URL}users/completeUserProfile/${userId}`, formData);
+}
+
+
+
+export {registerUser, loginUser, postProject, getAllProjects, getProjectDetails, bidOnProject, getClientPostedProjects, getAllBidsOfAProject, getClientInProgressProjects, bidSelected, getFreelancerInProgressProjects, getUserDetails, completeUserProfile}

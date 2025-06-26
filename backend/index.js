@@ -3,7 +3,8 @@ import mongoose from "mongoose";
 import cors from "cors"
 import authenticationRouter from "./routes/authentication.route.js";
 import projectRouter from "./routes/project.route.js";
-import bidRouter from "./routes/bid.route.js"
+import bidRouter from "./routes/bid.route.js";
+import userRouter from "./routes/user.route.js";
 const app = express()
 
 
@@ -15,6 +16,7 @@ app.use(cors())
 app.use("/authenticate", authenticationRouter)
 app.use("/projects", projectRouter)
 app.use("/bids", bidRouter)
+app.use("/users", userRouter)
 
 mongoose.connect("mongodb://localhost:27017/").then(()=>{
     console.log("connected to mongoDB")
